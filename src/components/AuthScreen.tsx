@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, Eye, EyeOff, ShieldCheck, ArrowRight, HelpCircle, Code, GraduationCap } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ShieldCheck, ArrowRight, HelpCircle, Code, GraduationCap, Sparkles } from 'lucide-react';
+import { 
+  authenticateWithGoogle, 
+  registerUserWithEmail, 
+  loginUserWithEmail, 
+  isFirebasePlaceholder 
+} from '../firebase';
 
 interface AuthScreenProps {
   onLoginSuccess: (user: { id: string; email: string; displayName: string }) => void;
@@ -34,7 +40,27 @@ export default function AuthScreen({ onLoginSuccess }: AuthScreenProps) {
     }
   };
 
-  const handleAuth = (e: React.FormEvent) => {
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setSuccessMsg('');
+    try {
+      const response = await authenticateWithGoogle();
+      if (response.success && response.user) {
+        if (response.mode === 'sandbox') {
+          setSuccessMsg('Authenticated via secure Google Sandbox credentials! Welcome explorer.');
+        } else {
+          setSuccessMsg('Google login successful! Loading live sandbox session...');
+        }
+        setTimeout(() => {
+          onLoginSuccess(response.user);
+        }, 800);
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Failed to authenticate using Google provider.');
+    }
+  };
+
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccessMsg('');
@@ -55,64 +81,45 @@ export default function AuthScreen({ onLoginSuccess }: AuthScreenProps) {
       return;
     }
 
-    const users = getStoredUsers();
+    try {
+      if (isLogin) {
+        // Login flow via real/fallback firebase helper
+        const response = await loginUserWithEmail(email, password);
+        if (response.success && response.user) {
+          if (response.mode === 'sandbox') {
+            setSuccessMsg('Authenticated student sandbox successfully! Welcome back.');
+          } else {
+            setSuccessMsg('Successfully logged into live Academy track!');
+          }
+          setTimeout(() => {
+            onLoginSuccess(response.user);
+          }, 800);
+        }
+      } else {
+        // Register flow via real/fallback firebase helper
+        if (!displayName.trim()) {
+          setError('Please provide a student name.');
+          return;
+        }
+        if (password !== confirmPassword) {
+          setError('Passwords do not match.');
+          return;
+        }
 
-    if (isLogin) {
-      // Login flow
-      const foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-      if (!foundUser) {
-        setError('No account found with this email. Click register below to create one.');
-        return;
+        const response = await registerUserWithEmail(email, password, displayName);
+        if (response.success && response.user) {
+          if (response.mode === 'sandbox') {
+            setSuccessMsg('Apprentice sandbox profile registered successfully! Logging you in...');
+          } else {
+            setSuccessMsg('Academy credentials created and certified!');
+          }
+          setTimeout(() => {
+            onLoginSuccess(response.user);
+          }, 1000);
+        }
       }
-      if (foundUser.password !== password) {
-        setError('Incorrect password. Please try again.');
-        return;
-      }
-
-      setSuccessMsg('Authenticating success! Welcome back.');
-      setTimeout(() => {
-        onLoginSuccess({
-          id: foundUser.id,
-          email: foundUser.email,
-          displayName: foundUser.displayName,
-        });
-      }, 800);
-    } else {
-      // Register flow
-      if (!displayName.trim()) {
-        setError('Please provide a student name.');
-        return;
-      }
-      if (password !== confirmPassword) {
-        setError('Passwords do not match.');
-        return;
-      }
-
-      const userExists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
-      if (userExists) {
-        setError('This email is already registered. Please log in instead.');
-        return;
-      }
-
-      // Create new user profile
-      const newUser = {
-        id: `usr-${Date.now()}`,
-        email: email.trim().toLowerCase(),
-        displayName: displayName.trim(),
-        password: password,
-      };
-
-      users.push(newUser);
-      saveStoredUsers(users);
-
-      setSuccessMsg('Account registered successfully! Logging you in...');
-      setTimeout(() => {
-        onLoginSuccess({
-          id: newUser.id,
-          email: newUser.email,
-          displayName: newUser.displayName,
-        });
-      }, 1000);
+    } catch (err: any) {
+      setError(err?.message || 'Authentication error. Please check inputs.');
     }
   };
 
@@ -332,6 +339,64 @@ export default function AuthScreen({ onLoginSuccess }: AuthScreenProps) {
             <ArrowRight className="h-4 w-4" />
           </button>
         </form>
+
+        <div className="relative flex py-4 items-center">
+          <div className="flex-grow border-t border-gray-150"></div>
+          <span className="flex-shrink mx-3 text-[10px] text-gray-400 font-bold uppercase tracking-wider font-mono">Or connect with</span>
+          <div className="flex-grow border-t border-gray-150"></div>
+        </div>
+
+        {/* Continue with Google Button */}
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          className="w-full flex items-center justify-center gap-2.5 rounded-lg border border-gray-250 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 text-sm font-bold transition-all cursor-pointer shadow-xs font-sans active:scale-98"
+          id="google-signin-btn"
+        >
+          <svg className="h-4.5 w-4.5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="#EA4335"
+              d="M12 5.04c1.67 0 3.19.57 4.37 1.7l3.26-3.26C17.65 1.58 15 1 12 1 7.24 1 3.22 3.73 1.34 7.7l3.92 3.04C6.18 7.55 8.85 5.04 12 5.04z"
+            />
+            <path
+              fill="#4285F4"
+              d="M23.49 12.27c0-.82-.07-1.61-.21-2.38H12v4.51h6.44c-.28 1.48-1.12 2.73-2.38 3.58l3.69 2.87c2.16-1.99 3.74-4.92 3.74-8.58z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.26 14.74a7.199 7.199 0 010-4.48L1.34 7.22A11.967 11.967 0 001 12c0 1.7.35 3.32.99 4.8l4.27-3.06z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.69-2.87c-1.11.75-2.53 1.19-4.27 1.19-3.15 0-5.82-2.51-6.74-5.7l-4.11 3.19C3.12 20.15 7.14 23 12 23z"
+            />
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+
+        {isFirebasePlaceholder ? (
+          <div className="mt-4 bg-orange-50/60 border border-orange-100 rounded-lg p-3 text-left">
+            <h5 className="text-[11px] font-extrabold text-orange-950 flex items-center gap-1">
+              <Sparkles className="h-3 w-3 text-orange-600 animate-pulse" />
+              <span>Sandbox Fallback Simulator Active</span>
+            </h5>
+            <p className="text-[10px] text-orange-800 leading-relaxed mt-0.5 font-medium">
+              We have prebuilt a local-storage sandbox that simulates the complete accounts registration, progress milestones, and dynamic dashboards instantly. Approve the Firebase console terms in the UI panel to link your live Database!
+            </p>
+          </div>
+        ) : (
+          <div className="mt-4 bg-emerald-50/50 border border-emerald-100 rounded-lg p-3 text-left">
+            <h5 className="text-[11px] font-extrabold text-emerald-950 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping inline-block" />
+              <span>Live Firebase Cloud Sync Connected</span>
+            </h5>
+            <p className="text-[10px] text-emerald-800 leading-relaxed mt-0.5 font-medium">
+              Your credentials will be authenticated and verified securely via the official live Firebase Auth SDK! 
+              <br />
+              <span className="text-[9px] opacity-80 font-mono">Note: Make sure "Email/Password" and "Google" sign-in methods are enabled in your Firebase console under Authentication &gt; Sign-In Method.</span>
+            </p>
+          </div>
+        )}
 
         {/* 1-Click Quick Sandbox Accounts divider */}
         <div className="relative flex py-4 items-center">

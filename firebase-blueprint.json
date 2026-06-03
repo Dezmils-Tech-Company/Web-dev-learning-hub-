@@ -1,0 +1,28 @@
+{
+  "entities": {
+    "UserProgress": {
+      "title": "User Progress",
+      "description": "Represents the student's active developer track, XP metrics, level, and unlocked achievements count.",
+      "type": "object",
+      "properties": {
+        "selectedLevel": { "type": "string" },
+        "selectedStack": { "type": "string" },
+        "xp": { "type": "integer" },
+        "level": { "type": "integer" },
+        "completedChapters": { "type": "array" },
+        "answeredQuizChapters": { "type": "array" },
+        "completedchallenges": { "type": "array" },
+        "badges": { "type": "array" },
+        "streakDays": { "type": "integer" },
+        "lastActiveDate": { "type": "string", "format": "date-time" }
+      },
+      "required": ["xp", "level", "completedChapters"]
+    }
+  },
+  "firestore": {
+    "/progress/{userId}": {
+      "schema": "UserProgress",
+      "description": "Saves student onboarding settings, XP scores, and earned achievement badges dynamically."
+    }
+  }
+}

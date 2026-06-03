@@ -17,6 +17,13 @@ import FloatingChatBot from './components/FloatingChatBot';
 import FooterDocumentModal from './components/FooterDocumentModal';
 import AuthScreen from './components/AuthScreen';
 import MyPortfolioHub from './components/MyPortfolioHub';
+import { 
+  saveCloudStudentProgress, 
+  fetchCloudStudentProgress, 
+  logoutCurrentUser,
+  auth,
+  onAuthStateChanged
+} from './firebase';
 
 // Local storage key helper
 const STORAGE_KEY = "dezmils_academy_progress";
@@ -45,8 +52,35 @@ export default function App() {
     }
   });
 
+  // Track if we are actively retrieving progress data from Firebase or LocalStorage
+  const [isLoadingProgress, setIsLoadingProgress] = useState<boolean>(!!currentUser);
+
   // Load progress from localStorage safely, keyed by user ID
   const [progress, setProgress] = useState<UserProgress>(DEFAULTS_PROGRESS);
+
+  // Listen and sync authenticated user with Firebase Auth service when available
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setCurrentUser({
+          id: firebaseUser.uid,
+          email: firebaseUser.email || '',
+          displayName: firebaseUser.displayName || 'Authorized Scholar'
+        });
+      } else {
+        // If logged out from Firebase but we are not on a local sandbox preset (which start with 'usr-')
+        // make sure to clear the React state
+        setCurrentUser((prev) => {
+          if (prev && !prev.id.startsWith('usr-')) {
+            return null;
+          }
+          return prev;
+        });
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Sync session state changing
   useEffect(() => {
@@ -60,33 +94,42 @@ export default function App() {
   // Handle active user configuration swaps dynamically
   useEffect(() => {
     if (currentUser) {
-      const userStorageKey = `dezmils_progress_${currentUser.id}`;
-      try {
-        const stored = localStorage.getItem(userStorageKey);
-        if (stored) {
-          setProgress(JSON.parse(stored));
-        } else {
-          // Check for legacy unauthenticated progress to migrate
-          const legacy = localStorage.getItem(STORAGE_KEY);
-          if (legacy) {
-            const legacyParsed = JSON.parse(legacy);
-            if (legacyParsed.selectedLevel) {
-              setProgress(legacyParsed);
-              // Store it in user-specific storage too
-              localStorage.setItem(userStorageKey, legacy);
+      setIsLoadingProgress(true);
+      // Async fetching from Cloud DB with responsive local fallback
+      fetchCloudStudentProgress(currentUser.id)
+        .then((cloudData) => {
+          if (cloudData) {
+            setProgress(cloudData);
+          } else {
+            // Check for legacy unauthenticated progress to migrate
+            const legacy = localStorage.getItem(STORAGE_KEY);
+            if (legacy) {
+              try {
+                const legacyParsed = JSON.parse(legacy);
+                if (legacyParsed.selectedLevel) {
+                  setProgress(legacyParsed);
+                  saveCloudStudentProgress(currentUser.id, legacyParsed);
+                } else {
+                  setProgress(DEFAULTS_PROGRESS);
+                }
+              } catch {
+                setProgress(DEFAULTS_PROGRESS);
+              }
             } else {
               setProgress(DEFAULTS_PROGRESS);
             }
-          } else {
-            setProgress(DEFAULTS_PROGRESS);
           }
-        }
-      } catch (e) {
-        console.warn("Could not reload saved user progress block:", e);
-        setProgress(DEFAULTS_PROGRESS);
-      }
+        })
+        .catch((e) => {
+          console.warn("Could not reload synced student progress:", e);
+          setProgress(DEFAULTS_PROGRESS);
+        })
+        .finally(() => {
+          setIsLoadingProgress(false);
+        });
     } else {
       setProgress(DEFAULTS_PROGRESS);
+      setIsLoadingProgress(false);
     }
   }, [currentUser]);
 
@@ -109,9 +152,8 @@ export default function App() {
 
   // Persist progress changes to user specific storage
   useEffect(() => {
-    if (currentUser) {
-      const userStorageKey = `dezmils_progress_${currentUser.id}`;
-      localStorage.setItem(userStorageKey, JSON.stringify(progress));
+    if (currentUser && progress.selectedLevel) {
+      saveCloudStudentProgress(currentUser.id, progress);
     }
   }, [progress, currentUser]);
 
@@ -236,7 +278,17 @@ export default function App() {
       {/* Auth Screen Login / Register Gate */}
       {!currentUser ? (
         <div className="flex-grow flex items-center justify-center py-12 bg-slate-900/5 backdrop-blur-xs">
-          <AuthScreen onLoginSuccess={(u) => setCurrentUser(u)} />
+          <AuthScreen onLoginSuccess={(u) => {
+            setIsLoadingProgress(true);
+            setCurrentUser(u);
+          }} />
+        </div>
+      ) : isLoadingProgress ? (
+        <div className="flex-grow flex flex-col items-center justify-center py-24 bg-slate-900/5 backdrop-blur-xs">
+          <div className="relative flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+            <p className="mt-4 text-xs font-mono text-slate-500 uppercase tracking-widest animate-pulse">Syncing Cloud Profile...</p>
+          </div>
         </div>
       ) : (
         <>
@@ -257,6 +309,7 @@ export default function App() {
                 currentUser={currentUser}
                 onLogout={() => {
                   if (window.confirm("Are you sure you would like to log out? Your user session progress is safely synchronized in local study slots.")) {
+                    logoutCurrentUser();
                     setCurrentUser(null);
                   }
                 }}

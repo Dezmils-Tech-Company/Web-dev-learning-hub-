@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Standard helper variables
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Helper to validate UserProgress schema parameters
+    function isValidUserProgress(data) {
+      return data.xp is int 
+        && data.xp >= 0 
+        && data.level is int 
+        && data.level >= 1
+        && data.completedChapters is list
+        && data.completedChapters.size() <= 200
+        && data.answeredQuizChapters is list
+        && data.answeredQuizChapters.size() <= 200
+        && data.completedchallenges is list
+        && data.completedchallenges.size() <= 200
+        && data.badges is list
+        && data.badges.size() <= 50
+        && data.streakDays is int
+        && data.streakDays >= 1
+        && data.lastActiveDate is string;
+    }
+
+    // Match statement for the progress collection
+    match /progress/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) 
+        && isValidId(userId)
+        && isValidUserProgress(request.resource.data);
+      allow update: if isOwner(userId) 
+        && isValidUserProgress(request.resource.data);
+      allow delete: if isOwner(userId);
+    }
+  }
+}
