@@ -13,6 +13,7 @@ import PeerForum from './components/PeerForum';
 import StatsView from './components/StatsView';
 import AchievementsGrid from './components/AchievementsGrid';
 import PracticeEditor from './components/PracticeEditor';
+import FloatingChatBot from './components/FloatingChatBot';
 
 // Local storage key helper
 const STORAGE_KEY = "dezmils_academy_progress";
@@ -240,6 +241,9 @@ export default function App() {
               </div>
             )}
           </main>
+          
+          {/* Floating interactive QA bot */}
+          <FloatingChatBot progress={progress} />
         </>
       )}
 

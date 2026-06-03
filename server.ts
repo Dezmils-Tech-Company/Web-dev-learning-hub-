@@ -214,6 +214,89 @@ Respond strictly in JSON:
   }
 });
 
+// REST Route: Dezmils Academy Floating Chat Bot
+app.post("/api/gemini/chat", async (req, res) => {
+  const { messages } = req.body; // Expecting array of { role: 'user' | 'model', content: string }
+
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ success: false, message: "Chat history missing." });
+  }
+
+  const latestMessage = messages[messages.length - 1].content;
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
+    // Elegant dynamic mock chatbot replies
+    const msgLower = latestMessage.toLowerCase();
+    let reply = "Hello! I am your Dezmils Academy Mentor bot. Since we are operating in offline simulation mode, I am happy to help you with your coding journey!";
+    
+    if (msgLower.includes("paste") || msgLower.includes("copy") || msgLower.includes("lock")) {
+      reply = "🔒 **Why is pasting locked?** At Dezmils Academy, we disable copy-pasting to prevent 'vibe coding'—where developers copy code lines they don't understand.\n\nTyping code activates muscle memory, reinforcing syntax, tags, hooks, and layout logic. Use the micro-macros below the editor if you're stuck, but focus on the tactile action of typing!";
+    } else if (msgLower.includes("react") || msgLower.includes("usestate") || msgLower.includes("hook")) {
+      reply = "⚛️ **React State Management:** React handles layout components reactively. Instead of manually querying the document, we use hooks like `useState` to declare values, and React automatically updates the view. Move slowly, understand how props flow, and don't rush the Virtual DOM updates!";
+    } else if (msgLower.includes("django") || msgLower.includes("python")) {
+      reply = "🐍 **Django & Python Server Views:** Django uses the MVC pattern. To return structured layout values to your frontend React app, you use `JsonResponse` with python dict mappings. Understanding server routing helps you secure endpoints and structure databases!";
+    } else if (msgLower.includes("html") || msgLower.includes("css") || msgLower.includes("flex")) {
+      reply = "🎨 **Beginner Layout Principles:** Always prefer HTML5 semantic tags (`<header>`, `<main>`, `<section>`, `<footer>`) instead of endless `<div>` spaghetti. For styling, master **CSS Flexbox** (`display: flex; justify-content: space-between;`) to align navigation items seamlessly across browsers.";
+    } else if (msgLower.includes("mern") || msgLower.includes("express") || msgLower.includes("mongodb")) {
+      reply = "🚀 **Advanced MERN Controllers:** Advanced full-stack work relies heavily on non-blocking `async/await` db calls. Using Express, write strict mongoose models and handle connection states securely inside try-catch boundaries to prevent server crashes.";
+    } else if (msgLower.includes("streak") || msgLower.includes("xp") || msgLower.includes("badge")) {
+      reply = "🏅 **Gamified Progress:** Gain XP by completing chapter challenges and passing quick quizzes. Build a consistent coding streak to unlock beautiful badges like the 'CSS Flex Wizard' and 'Full Stack Overlord'! Consistency beats intensity.";
+    } else if (msgLower.includes("who is ezra") || msgLower.includes("ezra") || msgLower.includes("founder")) {
+      reply = "Dev Master Ezra is the Principal LMS Instructor & founder here at Dezmils Academy. He manages the curriculum, verifies student code submissions, and guides you on your road from Beginner HTML layouts to Advanced full-stack deployment.";
+    }
+
+    return res.json({
+      success: true,
+      text: reply
+    });
+  }
+
+  try {
+    const ai = getGeminiClient();
+
+    const systemInstruction = `You are "Dezmils Chatbot", a friendly, motivating AI mentor at the "Dezmils Software Academy LMS" (Learning Management System).
+The academy specializes in hands-on, high-retention software engineering learning.
+
+Core Principles of Dezmils Academy:
+1. "No Vibe-Coding": Students shouldn't just guess or write random code until it compiles. They must understand syntax, structure, parameters, and line-by-line meanings.
+2. "Muscle Memory Activation": Typing code is strictly required. Direct copy-pasting is intentionally locked in the interface, motivating students to type out everything tactilely or select macro assistance keys.
+3. Interactive Portfolio-Building: The curriculum revolves around building a personal portfolio through separate, modular chapters.
+
+Curriculum Tracks:
+- Beginner Level (HTML/CSS/JS): Portfolio semantic structures, CSS flexbox and grid layouts, dynamic filter arrays.
+- Intermediate Level (React / Next.js / Django): Props & useState state hooks, Next.js routing structures, Django JSON REST views.
+- Advanced Level (MERN / Full-Stack): Express server REST endpoints, database controllers, async MongoDB operations.
+
+Your tone should be helpful, encouraging, and deeply technical yet clear. Encourage the student to keep practicing, type out their code, maintain their day streaks, and master the fundamentals. Keep your responses structured with bullet points or formatted markdown code snippets where helpful, and keep them reasonably concise so it fits easily within a floating chat widget.
+
+Reply to the user's latest query in the context of the conversion or about Dezmils Academy.`;
+
+    // Map the messages array to the format expected by generateContent
+    const formattedContents = messages.map(msg => ({
+      role: msg.role === "user" ? "user" : "model",
+      parts: [{ text: msg.content }]
+    }));
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: formattedContents,
+      config: {
+        systemInstruction
+      }
+    });
+
+    const textOutput = response.text || "I was unable to formulate a response. Let me know if you would like me to clarify!";
+    res.json({ success: true, text: textOutput });
+  } catch (err: any) {
+    console.error("Gemini Chat Integration Error:", err);
+    res.status(500).json({
+      success: false,
+      message: `Could not synthesize chat response: ${err.message}`
+    });
+  }
+});
+
 // Start routing and asset listening
 async function bootstrapServer() {
   // Vite integration handling
