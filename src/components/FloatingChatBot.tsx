@@ -16,7 +16,7 @@ export default function FloatingChatBot({ progress }: FloatingChatBotProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'model',
-      content: "👋 Greetings, student! I am the **Dezmils Academy AI Mentor**, tuned by Principal Instructor Ezra. \n\nI can answer questions regarding our strict curriculum, layout principles, and why we intentionally lock copy-pasting to activate your code muscle memory! How can I help you today?"
+      content: "👋 Greetings, student! I am the **Dezmils Software Academy AI Mentor**, tuned by Principal Instructor Ezra. \n\nI can answer questions regarding our curriculum, layout principles, and active portfolio milestones! How can I help you today?"
     }
   ]);
   const [input, setInput] = useState('');
@@ -81,7 +81,7 @@ export default function FloatingChatBot({ progress }: FloatingChatBotProps) {
   };
 
   const suggestedPrompts = [
-    { label: "🔒 Why lock copy-paste?", text: "Why is copy-pasting code disabled at Dezmils Academy?" },
+    { label: "🧠 Practice Tips", text: "What is the best way to practice coding at Dezmils Software Academy?" },
     { label: "📚 Describe Curriculum", text: "What are the levels and tracks of training at Dezmils?" },
     { label: "💡 Flexbox layout tips", text: "Explain CSS Flexbox layout principles for junior developers" },
     { label: "⚛️ React hook basics", text: "Explain useState hook in reusable components" },
@@ -217,7 +217,7 @@ export default function FloatingChatBot({ progress }: FloatingChatBotProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative group h-14 w-14 rounded-full bg-gradient-to-br from-orange-600 to-orange-500 text-white flex items-center justify-center shadow-xl hover:shadow-orange-600/20 shadow-orange-950/20 transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-orange-950/20"
-        title="Ask Dezmils Academy Bot"
+        title="Ask Dezmils Software Academy Bot"
         id="toggle-dezmils-chatbot"
       >
         {isOpen ? (

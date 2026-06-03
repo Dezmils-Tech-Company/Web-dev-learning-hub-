@@ -1,0 +1,6 @@
+{
+  "name": "Dezmils Software Academy",
+  "description": "An interactive, AI-powered LMS for learning web development (HTML/CSS/JS, React, Next.js, Django) through hands-on portfolio creation, featuring a interactive mentor chat and mock Q&A peer network.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

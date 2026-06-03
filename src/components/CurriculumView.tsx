@@ -27,9 +27,6 @@ export default function CurriculumView({ chapters, progress, onUpdateProgress }:
   // Highlighted hover line for details
   const [hoveredLineNum, setHoveredLineNum] = useState<number | null>(null);
 
-  // Paste alert message
-  const [pasteWarning, setPasteWarning] = useState<string | null>(null);
-
   // Quiz active state
   const [selectedQuizOption, setSelectedQuizOption] = useState<number | null>(null);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
@@ -55,11 +52,9 @@ export default function CurriculumView({ chapters, progress, onUpdateProgress }:
     }
   }, [activeChapter.id, activeFileIndex]);
 
-  // Handle prevention of code copy-pasting
+  // Handle prevention of code copy-pasting silently
   const handlePastePrevented = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
-    setPasteWarning("🚫 Copy-paste is strict-disabled in Dezmils Academy to cement tactile hand-coding and build your structural coding mechanics! Please use keyboard typing or click the macro blocks below.");
-    setTimeout(() => setPasteWarning(null), 7050);
   };
 
   // Keyboard shortcut macros to append code instantly
@@ -380,8 +375,8 @@ export default function CurriculumView({ chapters, progress, onUpdateProgress }:
               <span className="font-mono text-xs font-bold text-gray-700">{activeFile.name} ({activeChapter.techStack})</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="bg-blue-105 bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded font-mono text-[10px] font-bold uppercase text-blue-900">
-                ✏️ STRICT: Typing mode
+              <span className="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded font-mono text-[10px] font-bold uppercase">
+                Active Codebox
               </span>
             </div>
           </div>
@@ -399,13 +394,6 @@ export default function CurriculumView({ chapters, progress, onUpdateProgress }:
               )}
             </span>
           </div>
-
-          {/* Paste Alert overlay */}
-          {pasteWarning && (
-            <div className="bg-red-50 border-b border-red-200 px-4 py-2.5 text-xs text-red-700 font-bold animate-shake">
-              {pasteWarning}
-            </div>
-          )}
 
           {/* Textarea Codebox */}
           <div className="flex bg-slate-950 text-slate-100 font-mono text-sm relative w-full overflow-hidden rounded-b-lg">

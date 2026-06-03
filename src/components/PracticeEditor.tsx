@@ -24,9 +24,6 @@ export default function PracticeEditor({ chapters, progress, onUpdateProgress }:
   // Store edited code mapped to chapter + file keys in state
   const [codeStores, setCodeStores] = useState<Record<string, string>>({});
   
-  // Paste warning alerts
-  const [pasteWarning, setPasteWarning] = useState<string | null>(null);
-  
   // Real-time compilation status and messages
   const [consoleLogs, setConsoleLogs] = useState<string[]>([]);
   const [previewTab, setPreviewTab] = useState<'visual' | 'console' | 'instructions'>('visual');
@@ -66,12 +63,9 @@ export default function PracticeEditor({ chapters, progress, onUpdateProgress }:
     setConsoleLogs(prev => [`[${timestamp}] ${msg}`, ...prev.slice(0, 19)]);
   };
 
-  // Handle prevention of code copy-pasting
+  // Handle prevention of code copy-pasting silently
   const handlePastePrevented = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
-    setPasteWarning("🚫 Copy-Paste Shield Triggered! Dezmils Academy strictly forbids pasting code to accelerate authentic muscle memory development. Please key in your solution.");
-    addLog("⚠️ Warning: Blocked an external clipboard insertion attempt.");
-    setTimeout(() => setPasteWarning(null), 8000);
   };
 
   // Run dynamic compilation simulation
@@ -319,7 +313,7 @@ export default function PracticeEditor({ chapters, progress, onUpdateProgress }:
           </span>
           <h2 className="text-2xl font-black text-gray-950 mt-1">LMS Dynamic Practice Editor</h2>
           <p className="text-xs text-gray-500 mt-1">
-            Hone your muscle memory in real-time. Code here with our strict copy-paste anti-vibe guard to complete design objectives.
+            Hone your development skills in real-time. Code here to complete the design objectives.
           </p>
         </div>
 
@@ -389,13 +383,6 @@ export default function PracticeEditor({ chapters, progress, onUpdateProgress }:
               <span>{activeChapter.challengeInstruction}</span>
             </div>
 
-            {/* Warn message */}
-            {pasteWarning && (
-              <div className="bg-red-50 border-b border-red-200 px-4 py-2 text-xs text-red-700 font-bold font-mono animate-pulse">
-                {pasteWarning}
-              </div>
-            )}
-
             {/* The Textarea editor */}
             <div className="flex bg-slate-950 text-slate-100 font-mono text-sm relative w-full overflow-hidden">
               {/* Line numbers gutter */}
@@ -422,7 +409,7 @@ export default function PracticeEditor({ chapters, progress, onUpdateProgress }:
             {/* Keyboard shortcuts macro buttons */}
             <div className="p-3 bg-slate-50 border-t border-gray-200">
               <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block mb-1.5">
-                ⌨️ Tactile Synthesizer Palette (append code snippets safely without typing):
+                ⌨️ Syntax Palette (quick-insert common components and symbols):
               </span>
               <div className="flex flex-wrap gap-1">
                 {getMacros().map((macro, idx) => (

@@ -228,10 +228,10 @@ app.post("/api/gemini/chat", async (req, res) => {
   if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
     // Elegant dynamic mock chatbot replies
     const msgLower = latestMessage.toLowerCase();
-    let reply = "Hello! I am your Dezmils Academy Mentor bot. Since we are operating in offline simulation mode, I am happy to help you with your coding journey!";
+    let reply = "Hello! I am your Dezmils Software Academy Mentor bot. Since we are operating in offline simulation mode, I am happy to help you with your coding journey!";
     
     if (msgLower.includes("paste") || msgLower.includes("copy") || msgLower.includes("lock")) {
-      reply = "🔒 **Why is pasting locked?** At Dezmils Academy, we disable copy-pasting to prevent 'vibe coding'—where developers copy code lines they don't understand.\n\nTyping code activates muscle memory, reinforcing syntax, tags, hooks, and layout logic. Use the micro-macros below the editor if you're stuck, but focus on the tactile action of typing!";
+      reply = "🔒 **Interactive Codebox Handling:** At Dezmils Software Academy, text entry fields are custom-tuned to encourage proactive construction and direct typing. Typing out code lines activates muscle memory, reinforcing syntax, tags, hooks, and layout logic. Use the help helpers below the editor if you're looking for common elements!";
     } else if (msgLower.includes("react") || msgLower.includes("usestate") || msgLower.includes("hook")) {
       reply = "⚛️ **React State Management:** React handles layout components reactively. Instead of manually querying the document, we use hooks like `useState` to declare values, and React automatically updates the view. Move slowly, understand how props flow, and don't rush the Virtual DOM updates!";
     } else if (msgLower.includes("django") || msgLower.includes("python")) {
@@ -243,7 +243,9 @@ app.post("/api/gemini/chat", async (req, res) => {
     } else if (msgLower.includes("streak") || msgLower.includes("xp") || msgLower.includes("badge")) {
       reply = "🏅 **Gamified Progress:** Gain XP by completing chapter challenges and passing quick quizzes. Build a consistent coding streak to unlock beautiful badges like the 'CSS Flex Wizard' and 'Full Stack Overlord'! Consistency beats intensity.";
     } else if (msgLower.includes("who is ezra") || msgLower.includes("ezra") || msgLower.includes("founder")) {
-      reply = "Dev Master Ezra is the Principal LMS Instructor & founder here at Dezmils Academy. He manages the curriculum, verifies student code submissions, and guides you on your road from Beginner HTML layouts to Advanced full-stack deployment.";
+      reply = "Dev Master Ezra is the Principal LMS Instructor & founder here at Dezmils Software Academy. He manages the curriculum, verifies student code submissions, and guides you on your road from Beginner HTML layouts to Advanced full-stack deployment.";
+    } else {
+      reply = "I am ready to help you with your files, exercises, and web development roadmap at Dezmils Software Academy!";
     }
 
     return res.json({
@@ -258,9 +260,9 @@ app.post("/api/gemini/chat", async (req, res) => {
     const systemInstruction = `You are "Dezmils Chatbot", a friendly, motivating AI mentor at the "Dezmils Software Academy LMS" (Learning Management System).
 The academy specializes in hands-on, high-retention software engineering learning.
 
-Core Principles of Dezmils Academy:
-1. "No Vibe-Coding": Students shouldn't just guess or write random code until it compiles. They must understand syntax, structure, parameters, and line-by-line meanings.
-2. "Muscle Memory Activation": Typing code is strictly required. Direct copy-pasting is intentionally locked in the interface, motivating students to type out everything tactilely or select macro assistance keys.
+Core Principles of Dezmils Software Academy:
+1. "Authentic Construction": Students write functional code line-by-line to understand syntax, structure, parameters, and design meanings.
+2. "Muscle Memory Activation": Typing code is recommended to internalize web architecture.
 3. Interactive Portfolio-Building: The curriculum revolves around building a personal portfolio through separate, modular chapters.
 
 Curriculum Tracks:
@@ -270,7 +272,7 @@ Curriculum Tracks:
 
 Your tone should be helpful, encouraging, and deeply technical yet clear. Encourage the student to keep practicing, type out their code, maintain their day streaks, and master the fundamentals. Keep your responses structured with bullet points or formatted markdown code snippets where helpful, and keep them reasonably concise so it fits easily within a floating chat widget.
 
-Reply to the user's latest query in the context of the conversion or about Dezmils Academy.`;
+Reply to the user's latest query in the context of the conversation or about Dezmils Software Academy.`;
 
     // Map the messages array to the format expected by generateContent
     const formattedContents = messages.map(msg => ({

@@ -34,14 +34,14 @@ export default function WelcomeScreen({ onSelected }: WelcomeScreenProps) {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 font-sans" id="welcome-screen">
       <div className="text-center">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-800">
-          🚀 Dezmils Academy - No Vibe Coding Core
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-850">
+          🚀 Dezmils Software Academy
         </span>
         <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-gray-950 sm:text-5xl">
           Master Software Engineering Through <span className="text-orange-600">Immediate Practice</span>
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base text-gray-600">
-          Stop blindly copy-pasting code fragments. Dezmils Academy locks pasting, teaching you structure, 
+          Dezmils Software Academy provides active, hands-on learning designed to teach you structure, 
           logic, and line-by-line understanding of web development through hands-on Personal Portfolio projects.
         </p>
       </div>
@@ -168,15 +168,14 @@ export default function WelcomeScreen({ onSelected }: WelcomeScreenProps) {
             onClick={handleStart}
             className="flex items-center gap-2 rounded bg-orange-600 px-6 py-3 font-sans text-sm font-semibold text-white hover:bg-orange-700 transition-colors shadow-sm cursor-pointer"
           >
-            <span>Lock Commits & Begin Training</span>
+            <span>Begin Training</span>
             <ArrowRight className="h-4 w-4" />
           </button>
         </div>
       </div>
 
       <div className="mt-8 text-center text-xs text-gray-500">
-        🛡️ <span className="font-semibold text-gray-700">Why Dezmils?</span> Every action counts. 
-        Pasting code triggers a layout warning. You write everything line-by-line to internalize code logic.
+        🛡️ <span className="font-semibold text-gray-700">Dezmils Software Academy</span> — Interactive, hands-on lessons for every stage of your coding career.
       </div>
     </div>
   );

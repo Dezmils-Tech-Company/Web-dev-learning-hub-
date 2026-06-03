@@ -28,7 +28,7 @@ export default function StatsView({ progress }: StatsViewProps) {
         {/* Statistics metrics card */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="font-bold text-gray-950 text-base">Student Performance Ledger</h3>
-          <p className="text-xs text-gray-500 mt-0.5">Your verifiable learning credentials on Dezmils Academy.</p>
+          <p className="text-xs text-gray-500 mt-0.5">Your verifiable learning credentials on Dezmils Software Academy.</p>
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-orange-50/50 border border-orange-100 rounded-lg p-5">
@@ -55,7 +55,7 @@ export default function StatsView({ progress }: StatsViewProps) {
             <div className="bg-slate-50 border border-gray-250 rounded-lg p-5">
               <span className="text-xxs font-mono font-bold text-gray-500 uppercase tracking-widest block">Academic Milestones</span>
               <span className="text-2xl font-black text-gray-900 mt-1 block">{progress.completedChapters.length} / 5 Chapters</span>
-              <p className="text-xxs text-gray-500 mt-1 font-mono">No vibe coding validated</p>
+              <p className="text-xxs text-gray-500 mt-1 font-mono">Chapters completed</p>
             </div>
           </div>
         </div>
@@ -64,7 +64,7 @@ export default function StatsView({ progress }: StatsViewProps) {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="border-b border-gray-150 pb-3">
             <h3 className="font-bold text-gray-950 text-base">Verifiable Competency Badges</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Badges are unlocked by writing real code blocks with 0% code paste triggers.</p>
+            <p className="text-xs text-gray-500 mt-0.5">Badges are unlocked by finishing chapter modules and custom layout projects.</p>
           </div>
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">

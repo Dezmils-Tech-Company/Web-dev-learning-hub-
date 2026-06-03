@@ -128,13 +128,13 @@ export default function AchievementsGrid({ progress }: AchievementsGridProps) {
       <div className="mt-8 p-4 rounded bg-slate-900 text-white flex flex-col md:flex-row justify-between items-center gap-4 text-left">
         <div>
           <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-orange-400 block">
-            Dezmils Academy LMS Accreditation
+            Dezmils Software Academy Accreditation
           </span>
           <h4 className="font-black text-sm mt-0.5">
             Manual Competency Portfolio Ledger Certification
           </h4>
           <p className="text-xxs text-slate-300 mt-1 leading-relaxed">
-            Every badge is cryptographically tied to tactile line-by-line keystroke entries. Copy-paste lock record is intact.
+            Every badge is cryptographically tied to your active learning progress and verified by our academy software validation.
           </p>
         </div>
         <div className="bg-slate-800 rounded border border-slate-700 px-3.5 py-2 font-mono text-[10px] font-bold text-orange-400 flex items-center gap-1.5 shrink-0 self-start md:self-center">
